@@ -23,38 +23,43 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args["JOB_NAME"], args)
 
-# Script generated for node Customer landing
-Customerlanding_node1688998940009 = glueContext.create_dynamic_frame.from_catalog(
+# Script generated for node AWS Glue Data Catalog
+AWSGlueDataCatalog_node1689598447504 = glueContext.create_dynamic_frame.from_catalog(
     database="stedi",
     table_name="customer_landing",
-    transformation_ctx="Customerlanding_node1688998940009",
+    transformation_ctx="AWSGlueDataCatalog_node1689598447504",
 )
 
 # Script generated for node SQL Query
-SqlQuery107 = """
+SqlQuery0 = """
 select * from myDataSource where sharewithresearchasofdate is not null
 """
-SQLQuery_node1689003774473 = sparkSqlQuery(
+SQLQuery_node1689603611900 = sparkSqlQuery(
     glueContext,
-    query=SqlQuery107,
-    mapping={"myDataSource": Customerlanding_node1688998940009},
-    transformation_ctx="SQLQuery_node1689003774473",
+    query=SqlQuery0,
+    mapping={"myDataSource": AWSGlueDataCatalog_node1689598447504},
+    transformation_ctx="SQLQuery_node1689603611900",
 )
 
 # Script generated for node Drop Duplicates
-DropDuplicates_node1689003523702 = DynamicFrame.fromDF(
-    SQLQuery_node1689003774473.toDF().dropDuplicates(),
+DropDuplicates_node1689603649229 = DynamicFrame.fromDF(
+    SQLQuery_node1689603611900.toDF().dropDuplicates(),
     glueContext,
-    "DropDuplicates_node1689003523702",
+    "DropDuplicates_node1689603649229",
 )
 
 # Script generated for node Amazon S3
-AmazonS3_node1689001576401 = glueContext.write_dynamic_frame.from_options(
-    frame=DropDuplicates_node1689003523702,
+AmazonS3_node1689603508669 = glueContext.getSink(
+    path="s3://tamhv2-bucket/customer_trusted/",
     connection_type="s3",
-    format="json",
-    connection_options={"path": "s3://tam-p3/customer/trusted/", "partitionKeys": []},
-    transformation_ctx="AmazonS3_node1689001576401",
+    updateBehavior="UPDATE_IN_DATABASE",
+    partitionKeys=[],
+    enableUpdateCatalog=True,
+    transformation_ctx="AmazonS3_node1689603508669",
 )
-
+AmazonS3_node1689603508669.setCatalogInfo(
+    catalogDatabase="stedi", catalogTableName="customer_trusted"
+)
+AmazonS3_node1689603508669.setFormat("json")
+AmazonS3_node1689603508669.writeFrame(DropDuplicates_node1689603649229)
 job.commit()

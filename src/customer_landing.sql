@@ -4,12 +4,12 @@ CREATE EXTERNAL TABLE IF NOT EXISTS `stedi`.`customer_landing` (
   `phone` string,
   `birthDay` date,
   `serialNumber` string,
-  `registrationDate` timestamp,
-  `lastUpdateDate` timestamp,
-  `shareWithResearchAsOfDate` timestamp,
-  `shareWithPublicAsOfDate` timestamp
+  `registrationDate` bigint,
+  `lastUpdateDate` bigint,
+  `shareWithResearchAsOfDate` bigint,
+  `shareWithPublicAsOfDate` bigint
 )
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION 's3://tam-p3/customer/'
+LOCATION 's3://tamhv2-bucket/customer/'
 TBLPROPERTIES ('classification' = 'json');
